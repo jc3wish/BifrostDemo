@@ -12,6 +12,7 @@ var l sync.RWMutex
 
 func init()  {
 	websocketList = make(map[int]*websocket.Conn,0)
+	xWebsocket()
 }
 
 func sendMsgToWsClient(data interface{}){

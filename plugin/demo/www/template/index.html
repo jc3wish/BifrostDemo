@@ -73,7 +73,7 @@
                                         <input type="text"  name="KeyConfig" id="KeyConfig" value="bifrost-bifrost_field_test-1" class="form-control">
                                     </div>
                                     <div class="col-sm-4">
-                                        <button data-toggle="button" class="btn-sm btn-primary sqlBtn" type="button">GET</button>
+                                        <button data-toggle="button" class="btn-sm btn-primary RedisBtn" type="button">GET</button>
 
                                     </div>
                                 </div>
@@ -95,7 +95,7 @@
                              </div>
                              <div class="col-sm-12 ibox-content"  style="border:0px">
 
-                                 
+
 
                              </div>
                          </div>
@@ -117,3 +117,59 @@
 
 </html>
 </html>
+        <script type="text/javascript">
+            $(function(){
+               $(".sqlBtn").click(
+                   function(){
+                       var index = $(this).attr("index");
+                       if (index == "" || index == undefined){
+                            return
+                       }
+                       var url = "/plugin/demo/execsql";
+                       $.post(
+                               url,
+                               {index:index},
+                               function(data,status){
+                                   if( status != 'success' ){
+                                       alert("reqeust error, reqeust status : "+status);
+                                       return false;
+                                   }
+                                   if(!data.status){
+                                       alert(data.msg);
+                                       return false;
+                                   }
+                                   alter("exec success");
+                               },
+                               'json'
+                       );
+                   }
+               );
+
+                $(".RedisBtn").click(
+                        function(){
+                            var Key = $("#KeyConfig").val();
+                            if (Key == "" || Key == undefined){
+                                return
+                            }
+                            var url = "/plugin/demo/redisget";
+                            $.post(
+                                    url,
+                                    {key:Key,type:"get"},
+                                    function(data,status){
+                                        if( status != 'success' ){
+                                            alert("reqeust error, reqeust status : "+status);
+                                            return false;
+                                        }
+                                        if(!data.status){
+                                            alert(data.msg);
+                                            return false;
+                                        }
+                                        alter(data.data);
+                                    },
+                                    'json'
+                            );
+                        }
+                );
+            });
+
+        </script>

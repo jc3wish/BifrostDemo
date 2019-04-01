@@ -92,6 +92,7 @@ func redisget_controller(w http.ResponseWriter,req *http.Request){
 		w.Write(returnDataResult(false,err.Error(),0))
 		return
 	}
+	defer redisClient.Close()
 	Type := req.Form.Get("type")
 	Key := req.Form.Get("key")
 	var data string
