@@ -24,8 +24,6 @@ type resultDataStruct struct {
 	Data interface{} `json:"data"`
 }
 
-var sessionMgr *xgo.SessionMgr = nil //session管理器
-
 func returnDataResult(r bool,msg string,data interface{})[]byte{
 	b,_:=json.Marshal(resultDataStruct{Status:r,Msg:msg,Data:data})
 	return  b
