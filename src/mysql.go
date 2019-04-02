@@ -9,9 +9,9 @@ func init(){
 
 }
 
-func NewMySQLConn() *MySQLConn{
+func NewMySQLConn(Uri string) *MySQLConn{
 	db := &MySQLConn{
-		Uri:"",
+		Uri:Uri,
 	}
 	db.DBConnect()
 	return db

@@ -73,7 +73,7 @@ func execsql_controller(w http.ResponseWriter,req *http.Request){
 		w.Write(returnDataResult(false,"param error",0))
 		return
 	}
-	db := NewMySQLConn()
+	db := NewMySQLConn(mysqlUri)
 	defer db.Close()
 	err := db.ExecSQL(sqlList[index])
 	if err != nil{

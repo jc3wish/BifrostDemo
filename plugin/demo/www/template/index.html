@@ -41,6 +41,8 @@
                          </div>
 
                      	<div class="col-sm-12 ibox-content"  style="border:0px">
+                            <p style="line-height: 300%"><h4>点击下面的 SQL 执行</h4></p>
+
 {{range $i, $sql := .SqlList}}
     <div style="line-height: 250%;word-wrap:break-word"><div>{{$sql}}</div>    &nbsp;&nbsp;
                             <button data-toggle="button" class="btn-sm btn-primary sqlBtn" index="{{$i}}" type="button">Exec</button>
@@ -67,6 +69,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-12 ibox-content"  style="border:0px">
+
+                                <p style="line-height: 300%"><h4>输入Key，可以查看 Redis 的值</h4></p>
+
                                 <div class="form-group" id="KeyConfigContair">
                                     <label class="col-sm-1 control-label">Key：</label>
                                     <div class="col-sm-7" style="position: relative">
@@ -76,6 +81,7 @@
                                         <button data-toggle="button" class="btn-sm btn-primary RedisBtn" type="button">GET</button>
 
                                     </div>
+                                    <div class="col-sm-12" style="padding-top: 10px" id="RedisContent"></div>
                                 </div>
 
                             </div>
@@ -93,7 +99,10 @@
                                      </a>
                                  </div>
                              </div>
-                             <div class="col-sm-12 ibox-content"  style="border:0px">
+
+                             <p style="line-height: 300%"><h4>&nbsp;&nbsp;&nbsp;&nbsp;Bifrost 同步到 Hprose 11520 端口的数据，会实时显示在这里 </h4></p>
+
+                             <div class="col-sm-12 ibox-content"  style="border:0px" id="hproseServerData">
 
 
 
@@ -125,7 +134,7 @@
                        if (index == "" || index == undefined){
                             return
                        }
-                       var url = "/plugin/demo/execsql";
+                       var url = "/bifrost/demo/execsql";
                        $.post(
                                url,
                                {index:index},
@@ -138,7 +147,7 @@
                                        alert(data.msg);
                                        return false;
                                    }
-                                   alter("exec success");
+                                   alert("exec success");
                                },
                                'json'
                        );
@@ -151,20 +160,22 @@
                             if (Key == "" || Key == undefined){
                                 return
                             }
-                            var url = "/plugin/demo/redisget";
+                            var url = "/bifrost/demo/redis";
                             $.post(
                                     url,
                                     {key:Key,type:"get"},
                                     function(data,status){
                                         if( status != 'success' ){
                                             alert("reqeust error, reqeust status : "+status);
+                                            $("#RedisContent").text("");
                                             return false;
                                         }
                                         if(!data.status){
                                             alert(data.msg);
+                                            $("#RedisContent").text("");
                                             return false;
                                         }
-                                        alter(data.data);
+                                        $("#RedisContent").text(data.data);
                                     },
                                     'json'
                             );
@@ -173,3 +184,56 @@
             });
 
         </script>
+
+<script language="javascript" type="text/javascript">
+
+    var getDataStatus = false;
+    var wsurl = "ws://"+document.domain+":"+window.location.port+"/bifrost/demo/wsapi";
+
+    function init()
+    {
+
+    }
+
+    function writeToScreen(data){
+        $("#hproseServerData").prepend("<p>"+data+"</p>");
+    }
+
+    function doConnect()
+    {
+        websocket = new WebSocket(wsurl);
+        websocket.onopen = function(evt) { onOpen(evt) };
+        websocket.onclose = function(evt) { onClose(evt) };
+        websocket.onmessage = function(evt) { onMessage(evt) };
+        websocket.onerror = function(evt) { onError(evt) };
+    }
+
+    function onOpen(evt)
+    {
+        getDataStatus = true;
+        websocket.send("1");
+    }
+
+    function onClose(evt)
+    {
+        getDataStatus = false;
+        writeToScreen("disconnected\n");
+    }
+
+    function onMessage(evt)
+    {
+        writeToScreen("" + evt.data);
+        websocket.send("1");
+    }
+
+
+    function onError(evt)
+    {
+        writeToScreen('error: ' + evt.data);
+        websocket.close();
+    }
+
+    window.addEventListener("load", init, false);
+    doConnect();
+
+</script>

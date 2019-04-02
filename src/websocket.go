@@ -2,8 +2,10 @@ package src
 
 import (
 	"net/http"
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 	"sync"
+	"log"
+	"io"
 )
 
 var websocketList map[int]*websocket.Conn
@@ -19,7 +21,10 @@ func sendMsgToWsClient(data interface{}){
 	l.RLock()
 	defer l.RUnlock()
 	for _,ws := range websocketList{
-		websocket.Message.Send(ws,data)
+		err := websocket.Message.Send(ws,data)
+		if err != nil{
+			log.Println("sendMsgToWsClient err:",err)
+		}
 	}
 }
 
@@ -44,9 +49,14 @@ func CallBackServer(ws *websocket.Conn) {
 		delete(websocketList, ID)
 		l.Unlock()
 	}
+	websocket.Message.Send(ws,"connect success")
 	defer Close()
 	for {
 		if err = websocket.Message.Receive(ws, &msg); err != nil {
+			if err == io.EOF{
+				continue
+			}
+			log.Println("ws CallBackServer err:",err)
 			return
 		}
 	}
