@@ -5,7 +5,6 @@ import (
 	"golang.org/x/net/websocket"
 	"sync"
 	"log"
-	"io"
 )
 
 var websocketList map[int]*websocket.Conn
@@ -53,9 +52,6 @@ func CallBackServer(ws *websocket.Conn) {
 	defer Close()
 	for {
 		if err = websocket.Message.Receive(ws, &msg); err != nil {
-			if err == io.EOF{
-				continue
-			}
 			log.Println("ws CallBackServer err:",err)
 			return
 		}
